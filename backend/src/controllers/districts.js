@@ -1,33 +1,34 @@
 const districtService = require("../services/districtService");
+const { successResponse, errorResponse } = require("../utils/response");
 
-const getDistrictsByState = async (req, res) => {
+const getDistrictsByState = async (req, res, next) => {
   const stateId = Number(req.params.stateId);
   const name = typeof req.query.name === "string" ? req.query.name.trim() : "";
 
   if (Number.isNaN(stateId)) {
-    return res.status(400).json({ error: "Invalid state ID" });
+    return errorResponse(res, "Invalid state ID", 400);
   }
 
   try {
     const districts = await districtService.getDistrictsByStateId(stateId, name);
-    res.json(districts);
+    return successResponse(res, districts);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching districts" });
+    return next(error);
   }
 };
 
-const searchDistricts = async (req, res) => {
+const searchDistricts = async (req, res, next) => {
   const name = typeof req.query.name === "string" ? req.query.name.trim() : "";
 
   if (!name) {
-    return res.status(400).json({ error: "Search query is required" });
+    return errorResponse(res, "Search query is required", 400);
   }
 
   try {
     const districts = await districtService.searchDistrictsByName(name);
-    res.json(districts);
+    return successResponse(res, districts);
   } catch (error) {
-    res.status(500).json({ error: "Error searching districts" });
+    return next(error);
   }
 };
 

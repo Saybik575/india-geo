@@ -42,4 +42,35 @@ const getAllStates = async (name) => {
   return states;
 };
 
-module.exports = { getAllStates };
+const getStateVillageCounts = async (limit = 10) => {
+  const normalizedLimit = Math.min(Math.max(Number(limit) || 10, 1), 50);
+  const cacheKey = `states:village-counts:${normalizedLimit}`;
+
+  const cachedData = await redisClient.get(cacheKey);
+  if (cachedData) {
+    console.log("Cache HIT - state village counts");
+    return JSON.parse(cachedData);
+  }
+
+  console.log("Cache MISS - state village counts");
+  const rows = await prisma.$queryRaw`
+    SELECT
+      s.state_code,
+      s.state_name,
+      COUNT(v.village_code)::int AS villages
+    FROM states s
+    LEFT JOIN districts d ON d.state_code = s.state_code
+    LEFT JOIN villages v ON v.district_code = d.district_code
+    GROUP BY s.state_code, s.state_name
+    ORDER BY villages DESC, s.state_name ASC
+    LIMIT ${normalizedLimit}
+  `;
+
+  await redisClient.set(cacheKey, JSON.stringify(rows), {
+    EX: 3600,
+  });
+
+  return rows;
+};
+
+module.exports = { getAllStates, getStateVillageCounts };

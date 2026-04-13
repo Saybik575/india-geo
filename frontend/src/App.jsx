@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import Dashboard from "./components/Dashboard";
 import VillageList from "./components/VillageList";
 import {
   getDistricts,
+  getStateVillageCounts,
   getStates,
   getSubdistricts,
   getVillages,
@@ -52,6 +54,11 @@ function App() {
     queryFn: () => getStates(),
   });
 
+  const stateVillageCountsQuery = useQuery({
+    queryKey: ["state-village-counts"],
+    queryFn: () => getStateVillageCounts(50),
+  });
+
   const districtsQuery = useQuery({
     queryKey: ["districts", selectedState],
     queryFn: () => getDistricts(selectedState),
@@ -94,6 +101,7 @@ function App() {
   const subdistricts = subdistrictsQuery.data ?? [];
   const villagesData = villagesQuery.data;
   const villages = villagesData?.data ?? [];
+  const stateVillageCounts = stateVillageCountsQuery.data ?? [];
   const totalVillages = villagesData?.total ?? 0;
   const totalPages = villagesData?.totalPages ?? 1;
   const villageSearchResults = villageSearchQuery.data ?? [];
@@ -116,6 +124,7 @@ function App() {
 
   const errorMessage =
     statesQuery.error?.message ||
+    stateVillageCountsQuery.error?.message ||
     districtsQuery.error?.message ||
     subdistrictsQuery.error?.message ||
     villagesQuery.error?.message ||
@@ -133,8 +142,8 @@ function App() {
   const subdistrictSearchLoading = subdistrictSearchQuery.isFetching;
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 p-6 text-slate-900">
+      <div className="mx-auto max-w-6xl">
         <header className="mb-8 rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur">
           <div>
             <div>
@@ -147,7 +156,14 @@ function App() {
             </div>
           </div>
         </header>
-
+        <Dashboard
+          states={states}
+          villages={villages}
+          page={page}
+          totalVillages={totalVillages}
+          chartData={stateVillageCounts}
+          chartLoading={stateVillageCountsQuery.isLoading}
+        />
         <main className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <section className="self-start rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_16px_50px_rgba(15,23,42,0.08)]">
             <h2 className="text-2xl font-bold tracking-tight text-slate-950">Search places</h2>
