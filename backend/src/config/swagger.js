@@ -8,6 +8,16 @@ const options = {
 			version: "1.0.0",
 			description: "API for accessing India village-level geographical data",
 		},
+		components: {
+			securitySchemes: {
+				ApiKeyAuth: {
+					type: "apiKey",
+					in: "header",
+					name: "x-api-key",
+				},
+			},
+		},
+		security: [{ ApiKeyAuth: [] }],
 		servers: [
 			{
 				url: "https://india-geo-api.onrender.com",
