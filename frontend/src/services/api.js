@@ -1,12 +1,12 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
-const API_KEY = import.meta.env.VITE_API_KEY ?? "12345";
+const API_KEY = import.meta.env.VITE_API_KEY ?? "";
 
 const buildHeaders = () => {
 	const headers = {
 		"Content-Type": "application/json",
 	};
 
-	if (API_KEY) {
+	  if (API_KEY.trim()) {
 		headers["x-api-key"] = API_KEY;
 	}
 
