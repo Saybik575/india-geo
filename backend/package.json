@@ -4,7 +4,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -12,17 +13,18 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^7.7.0",
+    "@prisma/adapter-pg": "^7.7.0",
     "@upstash/redis": "^1.37.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.2",
     "morgan": "^1.10.1",
+    "pg": "^8.16.3",
     "redis": "^5.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "prisma": "^7.7.0"
+    "nodemon": "^3.1.14"
   },
   "overrides": {
     "@hono/node-server": "1.19.13"
