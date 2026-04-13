@@ -29,8 +29,13 @@ app.get("/", (req, res) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/states", apiKeyAuth, stateRoutes);
+app.use("/api/states", apiKeyAuth, stateRoutes);
+
 app.use("/districts", apiKeyAuth, districtRoutes);
+app.use("/api/districts", apiKeyAuth, districtRoutes);
+
 app.use("/subdistricts", apiKeyAuth, subdistrictRoutes);
+app.use("/api/subdistricts", apiKeyAuth, subdistrictRoutes);
 app.get("/api/districts/search", apiKeyAuth, searchDistricts);
 app.get("/api/subdistricts/search", apiKeyAuth, searchSubdistricts);
 app.get("/api/villages", apiKeyAuth, getVillages);
