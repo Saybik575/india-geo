@@ -30,16 +30,81 @@ const getDistrictsByStateId = async (stateId, name) => {
     select: {
       district_code: true,
       district_name: true,
+      state_code: true,
+      states: {
+        select: {
+          state_name: true,
+        },
+      },
     },
     orderBy: { district_name: "asc" },
   });
 
-  // 3. Store in cache (TTL = 1 hour)
-  await redisClient.set(cacheKey, JSON.stringify(districts), {
+  // 3. Transform to include state name
+  const transformedDistricts = districts.map((district) => ({
+    district_code: district.district_code,
+    district_name: district.district_name,
+    state_code: district.state_code,
+    state_name: district.states?.state_name || "",
+  }));
+
+  // 4. Store in cache (TTL = 1 hour)
+  await redisClient.set(cacheKey, JSON.stringify(transformedDistricts), {
     EX: 3600,
   });
 
-  return districts;
+  return transformedDistricts;
 };
 
-module.exports = { getDistrictsByStateId };
+const searchDistrictsByName = async (name) => {
+  const normalizedName = typeof name === "string" ? name.trim() : "";
+
+  if (!normalizedName) {
+    return [];
+  }
+
+  const cacheKey = `districts:search:${normalizedName.toLowerCase()}`;
+  const cachedData = await redisClient.get(cacheKey);
+
+  if (cachedData) {
+    console.log("Cache HIT - district search");
+    return JSON.parse(cachedData);
+  }
+
+  console.log("Cache MISS - district search");
+  const districts = await prisma.districts.findMany({
+    where: {
+      district_name: {
+        contains: normalizedName,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      district_code: true,
+      district_name: true,
+      state_code: true,
+      states: {
+        select: {
+          state_name: true,
+        },
+      },
+    },
+    orderBy: { district_name: "asc" },
+    take: 20,
+  });
+
+  const transformedDistricts = districts.map((district) => ({
+    district_code: district.district_code,
+    district_name: district.district_name,
+    state_code: district.state_code,
+    state_name: district.states?.state_name || "",
+  }));
+
+  await redisClient.set(cacheKey, JSON.stringify(transformedDistricts), {
+    EX: 3600,
+  });
+
+  return transformedDistricts;
+};
+
+module.exports = { getDistrictsByStateId, searchDistrictsByName };

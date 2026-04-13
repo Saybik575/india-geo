@@ -16,4 +16,19 @@ const getDistrictsByState = async (req, res) => {
   }
 };
 
-module.exports = { getDistrictsByState };
+const searchDistricts = async (req, res) => {
+  const name = typeof req.query.name === "string" ? req.query.name.trim() : "";
+
+  if (!name) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
+
+  try {
+    const districts = await districtService.searchDistrictsByName(name);
+    res.json(districts);
+  } catch (error) {
+    res.status(500).json({ error: "Error searching districts" });
+  }
+};
+
+module.exports = { getDistrictsByState, searchDistricts };
