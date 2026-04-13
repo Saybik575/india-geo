@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_FROM_ENV = (import.meta.env.VITE_API_URL ?? "").trim();
+// Default to Vercel rewrite path when env var is missing.
+const BASE_URL = (API_BASE_FROM_ENV || "/api/v1").replace(/\/+$/, "");
 const API_KEY = import.meta.env.VITE_API_KEY ?? "";
 
 const buildHeaders = () => {
@@ -14,7 +16,8 @@ const buildHeaders = () => {
 };
 
 const fetchJson = async (path) => {
-	const response = await fetch(`${BASE_URL}${path}`, {
+	const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+	const response = await fetch(`${BASE_URL}${normalizedPath}`, {
 		headers: buildHeaders(),
 	});
 
