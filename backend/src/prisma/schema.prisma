@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model countries {
+  id     Int      @id @default(autoincrement())
+  name   String   @unique
+  states states[]
+}
+
+model districts {
+  district_code Int            @id
+  district_name String
+  state_code    Int
+  states        states         @relation(fields: [state_code], references: [state_code], onDelete: Cascade, onUpdate: NoAction)
+  subdistricts  subdistricts[]
+  villages      villages[]
+
+  @@unique([district_name, state_code])
+  @@index([state_code], map: "idx_districts_state_code")
+}
+
+model states {
+  state_code Int         @id
+  state_name String
+  country_id Int
+  districts  districts[]
+  countries  countries   @relation(fields: [country_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([state_name, country_id])
+}
+
+model subdistricts {
+  subdistrict_code Int        @id
+  subdistrict_name String
+  district_code    Int
+  districts        districts  @relation(fields: [district_code], references: [district_code], onDelete: Cascade, onUpdate: NoAction)
+  villages         villages[]
+
+  @@unique([subdistrict_name, district_code])
+  @@index([district_code], map: "idx_subdistricts_district_code")
+}
+
+model villages {
+  village_code     Int          @id
+  village_name     String
+  subdistrict_code Int
+  district_code    Int
+  districts        districts    @relation(fields: [district_code], references: [district_code], onDelete: Cascade, onUpdate: NoAction)
+  subdistricts     subdistricts @relation(fields: [subdistrict_code], references: [subdistrict_code], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([village_name, subdistrict_code])
+  @@index([district_code], map: "idx_villages_district_code")
+  @@index([subdistrict_code], map: "idx_villages_subdistrict_code")
+}
