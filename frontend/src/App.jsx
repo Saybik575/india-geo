@@ -157,10 +157,6 @@ function App() {
           </div>
         </header>
         <Dashboard
-          states={states}
-          villages={villages}
-          page={page}
-          totalVillages={totalVillages}
           chartData={stateVillageCounts}
           chartLoading={stateVillageCountsQuery.isLoading}
         />

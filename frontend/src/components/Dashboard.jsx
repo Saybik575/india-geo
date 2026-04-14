@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Brush } from "recharts";
 
-function Dashboard({ states, villages, page, totalVillages, chartData, chartLoading }) {
+function Dashboard({ chartData, chartLoading }) {
   const data = (chartData ?? []).map((state) => ({
     name: state.state_name,
     villages: state.villages,
@@ -9,28 +9,6 @@ function Dashboard({ states, villages, page, totalVillages, chartData, chartLoad
   return (
     <div className="mb-6">
       <h2 className="mb-4 text-xl font-semibold">Dashboard Overview</h2>
-
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div className="rounded-xl bg-white p-4 shadow">
-          <p className="text-sm text-gray-500">States</p>
-          <p className="text-2xl font-bold">{states.length}</p>
-        </div>
-
-        <div className="rounded-xl bg-white p-4 shadow">
-          <p className="text-sm text-gray-500">Villages (loaded)</p>
-          <p className="text-2xl font-bold">{villages.length}</p>
-        </div>
-
-        <div className="rounded-xl bg-white p-4 shadow">
-          <p className="text-sm text-gray-500">Active Page</p>
-          <p className="text-2xl font-bold">{page}</p>
-        </div>
-
-        <div className="rounded-xl bg-white p-4 shadow">
-          <p className="text-sm text-gray-500">Villages (total)</p>
-          <p className="text-2xl font-bold">{totalVillages}</p>
-        </div>
-      </div>
 
       <div className="h-80 rounded-xl bg-white p-4 shadow">
         {chartLoading ? (
