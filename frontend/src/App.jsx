@@ -136,6 +136,7 @@ function App() {
   const loadingStates = statesQuery.isLoading;
   const loadingDistricts = districtsQuery.isFetching;
   const loadingSubdistricts = subdistrictsQuery.isFetching;
+  const noSubdistrictsAvailable = !!selectedDistrict && !loadingSubdistricts && subdistricts.length === 0;
   const loadingVillages = villagesQuery.isFetching;
   const villageSearchLoading = villageSearchQuery.isFetching;
   const districtSearchLoading = districtSearchQuery.isFetching;
@@ -384,7 +385,9 @@ function App() {
                         ? "Select district first"
                         : loadingSubdistricts
                           ? "Loading subdistricts..."
-                          : "Select Subdistrict"}
+                          : noSubdistrictsAvailable
+                            ? "No subdistricts available"
+                            : "Select Subdistrict"}
                     </option>
                     {subdistricts.map((subdistrict) => (
                       <option key={subdistrict.subdistrict_code} value={subdistrict.subdistrict_code}>
@@ -392,6 +395,11 @@ function App() {
                       </option>
                     ))}
                   </select>
+                  {noSubdistrictsAvailable ? (
+                    <p className="mt-2 text-xs text-amber-700">
+                      No subdistrict data is available for this district in the dataset. Please choose another district.
+                    </p>
+                  ) : null}
                 </label>
               </div>
             </div>
@@ -411,7 +419,9 @@ function App() {
                   emptyMessage={
                     selectedSubdistrict
                       ? "No villages found on this page."
-                      : "Please select a subdistrict to load villages."
+                      : noSubdistrictsAvailable
+                        ? "Choose a different district that has subdistrict data."
+                        : "Please select a subdistrict to load villages."
                   }
                 />
               </div>
